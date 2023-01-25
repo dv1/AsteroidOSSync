@@ -94,6 +94,14 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".services.ExternalAppMessageReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="org.asteroidos.sync.connectivity.extappmessage.PUSH" />
+            </intent-filter>
+        </receiver>
+
         <provider
             android:name=".services.GenericFileProvider"
             android:authorities="${applicationId}.fileprovider"

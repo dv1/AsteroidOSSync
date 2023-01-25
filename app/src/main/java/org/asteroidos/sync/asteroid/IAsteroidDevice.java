@@ -20,6 +20,8 @@ public interface IAsteroidDevice {
 
     ConnectionState getConnectionState();
 
+    int getMaxGattTransmissionSize();
+
     void send(UUID characteristic, byte[] data, IConnectivityService service);
     void registerBleService(IConnectivityService service);
     void unregisterBleService(UUID serviceUUID);

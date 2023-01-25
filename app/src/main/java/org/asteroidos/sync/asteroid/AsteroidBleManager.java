@@ -35,6 +35,11 @@ public class AsteroidBleManager extends BleManager {
     public HashMap<UUID, IServiceCallback> recvCallbacks;
     public HashMap<UUID, BluetoothGattCharacteristic> sendingCharacteristics;
 
+    // The GATT MTU. This size includes 3 extra bytes that are used for GATT metadata
+    // (1 op-code byte and 2 attribute handle bytes).
+    // Consequently, the maximum GATT payload size is MTU_SIZE - 3.
+    private static final int MTU_SIZE = 256;
+
     public AsteroidBleManager(@NonNull final Context context, SynchronizationService syncService) {
         super(context);
         mSynchronizationService = syncService;
@@ -81,6 +86,10 @@ public class AsteroidBleManager extends BleManager {
 
     public final void readCharacteristics() {
         readCharacteristic(batteryCharacteristic).with(((device, data) -> setBatteryLevel(data))).enqueue();
+    }
+
+    public final int getMaxGattTransmissionSize() {
+        return MTU_SIZE - 3; // subtract the 1 op-code byte and 2 attribute handle bytes
     }
 
     private abstract class AsteroidBleManagerGattCallback extends BleManagerGattCallback {
@@ -134,7 +143,7 @@ public class AsteroidBleManager extends BleManager {
         @Override
         protected final void initialize() {
             beginAtomicRequestQueue()
-                    .add(requestMtu(256) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+                    .add(requestMtu(MTU_SIZE) // See the MTU_SIZE comments above for details about this
                             .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
                             .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
                     .done(device -> log(Log.INFO, "Target initialized"))

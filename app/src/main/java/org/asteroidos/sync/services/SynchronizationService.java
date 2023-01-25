@@ -42,6 +42,7 @@ import org.asteroidos.sync.MainActivity;
 import org.asteroidos.sync.R;
 import org.asteroidos.sync.asteroid.AsteroidBleManager;
 import org.asteroidos.sync.asteroid.IAsteroidDevice;
+import org.asteroidos.sync.connectivity.ExternalAppMessageService;
 import org.asteroidos.sync.connectivity.IConnectivityService;
 import org.asteroidos.sync.connectivity.IService;
 import org.asteroidos.sync.connectivity.IServiceCallback;
@@ -169,6 +170,10 @@ public class SynchronizationService extends Service implements IAsteroidDevice, 
         return mState;
     }
 
+    public final int getMaxGattTransmissionSize() {
+        return mBleMngr.getMaxGattTransmissionSize();
+    }
+
     @Override
     public final void send(UUID characteristic, byte[] data, IConnectivityService service) {
         mBleMngr.send(characteristic, data);
@@ -284,6 +289,7 @@ public class SynchronizationService extends Service implements IAsteroidDevice, 
             registerBleService(new WeatherService(getApplicationContext(), this));
             registerBleService(new ScreenshotService(getApplicationContext(), this));
             registerBleService(new TimeService(getApplicationContext(), this));
+            registerBleService(new ExternalAppMessageService(getApplicationContext(), this));
         }
 
         handleConnect();
